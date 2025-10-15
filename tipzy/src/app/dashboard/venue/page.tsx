@@ -7,7 +7,6 @@ import { getVenues, saveVenues } from "@/lib/storage";
 import { currentUser } from "@/lib/auth";
 import type { StaffMember, Venue } from "@/types";
 import { useMemo, useState } from "react";
-import { CSVLink } from "react-csv";
 
 export default function VenueDashboard() {
   return (
@@ -39,7 +38,23 @@ function Content() {
     setNewStaffName("");
   }
 
-  const csvData = venue?.staff.map((s) => ({ id: s.id, name: s.name, role: s.role, virtualUPI: s.virtualUPI })) || [];
+  function downloadStaffCsv() {
+    if (!venue) return;
+    const headers = ["id", "name", "role", "virtualUPI"];
+    const rows = venue.staff.map((s) => [s.id, s.name, s.role, s.virtualUPI]);
+    const csv = [headers, ...rows]
+      .map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(","))
+      .join("\r\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "staff.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
 
   return (
     <div className="mx-auto w-full container-max px-4 sm:px-6 lg:px-8 py-8 grid gap-6">
@@ -91,7 +106,7 @@ function Content() {
             ))}
           </div>
           <div className="mt-4">
-            <CSVLink data={csvData} filename="staff.csv" className="text-sm text-[--color-primary] hover:underline">Download staff CSV</CSVLink>
+            <button onClick={downloadStaffCsv} className="text-sm text-[--color-primary] hover:underline">Download staff CSV</button>
           </div>
         </CardContent>
       </Card>

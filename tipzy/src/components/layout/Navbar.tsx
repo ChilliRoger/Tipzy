@@ -16,7 +16,7 @@ export default function Navbar() {
 
   const linkClass = (href: string) =>
     `px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-      pathname === href ? "text-[--color-primary]" : "text-[--color-text]/80 hover:text-[--color-primary]"
+      pathname === href ? "text-white" : "text-white hover:text-white/80"
     }`;
 
   return (
